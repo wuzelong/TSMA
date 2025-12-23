@@ -54,7 +54,6 @@ class Model(nn.Module):
             dimension=-1, size=self.input_token_len, step=self.input_token_len)
         N = x1.shape[2]
         batch_date1 = batch_date1.unfold(
-
             dimension=-1, size=self.input_token_len, step=self.input_token_len)
         batch_date1 = batch_date1[:, :, 0:1]
         batch_date1 = batch_date1.squeeze(-1)

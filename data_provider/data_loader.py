@@ -311,3 +311,104 @@ class Dataset_ERA5_Pretrain_Test(Dataset):
     def inverse_transform(self, data):
         return self.scaler.inverse_transform(data)
 
+
+
+class UTSD_Npy(Dataset):
+    def __init__(self, root_path, flag='train', size=None, data_path='ETTh1.csv', scale=True, nonautoregressive=False, stride=1, split=0.9, test_flag='T', subset_rand_ratio=1.0):
+        self.seq_len = size[0]
+        self.input_token_len = size[1]
+        self.output_token_len = size[2]
+        self.context_len = self.seq_len + self.output_token_len
+        self.flag = flag
+        assert flag in ['train', 'test', 'val']
+        type_map = {'train': 0, 'val': 1, 'test': 2}
+        self.set_type = type_map[flag]
+        self.scale = scale
+        self.root_path = root_path
+        self.nonautoregressive = nonautoregressive
+        self.split = split
+        self.stride = stride
+        self.data_list = []
+        self.date_list = []
+        self.n_window_list = []
+        self.__confirm_data__()
+
+    def __confirm_data__(self):
+        for root, dirs, files in os.walk(self.root_path):
+            for file in files:
+                if file.endswith('.npy'):
+                    dataset_path = os.path.join(root, file)
+
+                    self.scaler = StandardScaler()
+                    data = np.load(dataset_path)
+
+                    num_train = int(len(data) * self.split)
+                    num_test = int(len(data) * (1 - self.split) / 2)
+                    num_vali = len(data) - num_train - num_test
+                    if num_train < self.context_len:
+                        continue
+                    border1s = [0, num_train - self.seq_len, len(data) - num_test - self.seq_len]
+                    border2s = [num_train, num_train + num_vali, len(data)]
+
+                    border1 = border1s[self.set_type]
+                    border2 = border2s[self.set_type]
+
+                    if self.scale:
+                        train_data = data[border1s[0]:border2s[0]]
+                        self.scaler.fit(train_data)
+                        data = self.scaler.transform(data)
+                    else:
+                        data = data
+
+                    data = data[border1:border2]
+                    n_timepoint = (
+                        len(data) - self.context_len) // self.stride + 1
+                    n_var = data.shape[1]
+                    self.data_list.append(data)
+
+                    date = np.arange(data.shape[0])
+                    date = date - date.min()
+                    date = date[border1:border2]
+                    self.date_list.append(date.reshape(-1, 1))
+
+                    n_window = n_timepoint * n_var
+
+                    self.n_window_list.append(n_window if len(
+                        self.n_window_list) == 0 else self.n_window_list[-1] + n_window)
+        print("Total number of windows in merged dataset: ",
+              self.n_window_list[-1])
+
+    def __getitem__(self, index):
+        assert index >= 0
+        # find the location of one dataset by the index
+        dataset_index = 0
+        while index >= self.n_window_list[dataset_index]:
+            dataset_index += 1
+
+        index = index - \
+            self.n_window_list[dataset_index -
+                               1] if dataset_index > 0 else index
+        n_timepoint = (
+            len(self.data_list[dataset_index]) - self.context_len) // self.stride + 1
+
+        c_begin = index // n_timepoint  # select variable
+        s_begin = index % n_timepoint  # select start timestamp
+        s_begin = self.stride * s_begin
+        s_end = s_begin + self.seq_len
+        r_begin = s_begin + self.input_token_len
+        r_end = s_end + self.output_token_len
+
+        seq_x = self.data_list[dataset_index][s_begin:s_end,
+                                              c_begin:c_begin + 1]
+        seq_y = self.data_list[dataset_index][r_begin:r_end,
+                                              c_begin:c_begin + 1]
+        seq_date = self.date_list[dataset_index][s_begin:s_end,
+                                              c_begin:c_begin + 1]
+        seq_x_mark = torch.zeros((seq_x.shape[0], 1))
+        seq_y_mark = torch.zeros((seq_x.shape[0], 1))
+        return seq_x, seq_y, seq_x_mark, seq_y_mark, seq_date.squeeze()
+
+    def __len__(self):
+        return self.n_window_list[-1]
+
+
