@@ -23,10 +23,10 @@ class Model(nn.Module):
     def __init__(self, configs):
         super(Model, self).__init__()
         self.use_norm = configs.use_norm
-        self.patch_size = configs.patch_size
-        self.stride = configs.stride
-        self.patch_num = (configs.seq_len - self.patch_size) // self.stride + 1
-        self.gpt_layers = configs.gpt_layers
+        self.patch_size = configs.input_token_len
+        self.stride = 8
+        self.patch_num = (configs.seq_len - self.input_token_len) // self.stride + 1
+        self.gpt_layers = 6
         self.padding_patch_layer = nn.ReplicationPad1d((0, self.stride))
         self.patch_num += 1
         self.gpt2 = GPT2Model.from_pretrained(
@@ -44,7 +44,7 @@ class Model(nn.Module):
 
         self.gpt2.h = self.gpt2.h[:self.gpt_layers]
 
-        self.in_layer = nn.Linear(configs.patch_size, configs.d_model)
+        self.in_layer = nn.Linear(configs.input_token_len, configs.d_model)
         self.out_layer = nn.Linear(configs.d_model * self.patch_num, configs.pred_len)
 
         for _, (name, param) in enumerate(self.gpt2.named_parameters()):
