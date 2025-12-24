@@ -1,4 +1,4 @@
-from models import TSMA
+from models import TSMA, gpt4ts
 
 
 class Exp_Basic(object):
@@ -6,6 +6,7 @@ class Exp_Basic(object):
         self.args = args
         self.model_dict = {
             "TSMA": TSMA,
+            "gpt4ts": gpt4ts,
         }
         self.model = self._build_model()
 
