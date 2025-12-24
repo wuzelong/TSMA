@@ -366,10 +366,13 @@ class UTSD_Npy(Dataset):
                     n_var = data.shape[1]
                     self.data_list.append(data)
 
+
                     date = np.arange(data.shape[0])
                     date = date - date.min()
                     date = date[border1:border2]
-                    self.date_list.append(date.reshape(-1, 1))
+                    date = date.reshape(-1, 1)
+                    date = np.tile(date, n_var)
+                    self.date_list.append(date)
 
                     n_window = n_timepoint * n_var
 
@@ -406,6 +409,8 @@ class UTSD_Npy(Dataset):
                                               c_begin:c_begin + 1]
         seq_x_mark = torch.zeros((seq_x.shape[0], 1))
         seq_y_mark = torch.zeros((seq_x.shape[0], 1))
+        print(seq_x.shape, seq_date.shape)
+
         return seq_x, seq_y, seq_x_mark, seq_y_mark, seq_date.squeeze()
 
     def __len__(self):
