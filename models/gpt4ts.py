@@ -29,18 +29,18 @@ class Model(nn.Module):
         self.gpt_layers = 6
         self.padding_patch_layer = nn.ReplicationPad1d((0, self.stride))
         self.patch_num += 1
-        self.gpt2 = GPT2Model.from_pretrained(
-            'gpt2', attn_implementation="eager",
-            output_hidden_states=True
-        )
+        # self.gpt2 = GPT2Model.from_pretrained(
+        #     'gpt2', attn_implementation="eager",
+        #     output_hidden_states=True
+        # )
         # 如果服务器不能联网下载模型的话，需要手动下载：https://huggingface.co/openai-community/gpt2/tree/main
         #把这些文件全部下载到./PLM/gpt2下面，然后使用下面的代码并注释上面的。
-        # self.gpt2 = GPT2Model.from_pretrained(
-        #     './PLM/gpt2/',
-        #     attn_implementation="eager",
-        #     output_hidden_states=True,
-        #     local_files_only=True,
-        # )
+        self.gpt2 = GPT2Model.from_pretrained(
+            './PLM/gpt2/',
+            attn_implementation="eager",
+            output_hidden_states=True,
+            local_files_only=True,
+        )
 
         self.gpt2.h = self.gpt2.h[:self.gpt_layers]
 

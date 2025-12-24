@@ -80,7 +80,10 @@ class Exp_Forecast(Exp_Basic):
                 batch_x_mark = batch_x_mark.float().to(self.device)
                 batch_y_mark = batch_y_mark.float().to(self.device)
 
-                outputs = self.model(batch_x, batch_date, batch_x_mark, batch_y_mark)
+                if self.args.model == 'gpt4ts':
+                    outputs = self.model(batch_x, batch_x_mark, batch_y_mark)
+                else:
+                    outputs = self.model(batch_x, batch_date, batch_x_mark, batch_y_mark)
 
                 if is_test or self.args.nonautoregressive:
                         outputs = outputs[:, -self.args.output_token_len:, :]
@@ -143,7 +146,11 @@ class Exp_Forecast(Exp_Basic):
                 batch_x_mark = batch_x_mark.float().to(self.device)
                 batch_y_mark = batch_y_mark.float().to(self.device)
 
-                outputs = self.model(batch_x, batch_date, batch_x_mark, batch_y_mark)
+                if self.args.model == 'gpt4ts':
+                    outputs = self.model(batch_x, batch_x_mark, batch_y_mark)
+                else:
+                    outputs = self.model(batch_x, batch_date, batch_x_mark, batch_y_mark)
+
 
                 if self.args.dp:
                     torch.cuda.synchronize()
@@ -204,7 +211,10 @@ class Exp_Forecast(Exp_Basic):
                     batch_x_mark = batch_x_mark.float().to(self.device)
                     batch_y_mark = batch_y_mark.float().to(self.device)
 
-                    outputs = self.model(batch_x, batch_date, batch_x_mark, batch_y_mark, stage_2=True)
+                    if self.args.model == 'gpt4ts':
+                        outputs = self.model(batch_x, batch_x_mark, batch_y_mark)
+                    else:
+                        outputs = self.model(batch_x, batch_date, batch_x_mark, batch_y_mark)
 
                     if self.args.dp:
                         torch.cuda.synchronize()
@@ -294,7 +304,10 @@ class Exp_Forecast(Exp_Basic):
                     if len(pred_y) != 0:
                         batch_x = torch.cat([batch_x[:, self.args.input_token_len:, :], pred_y[-1]], dim=1)
 
-                    outputs = self.model(batch_x, batch_date, batch_x_mark, batch_y_mark)
+                    if self.args.model == 'gpt4ts':
+                        outputs = self.model(batch_x, batch_x_mark, batch_y_mark)
+                    else:
+                        outputs = self.model(batch_x, batch_date, batch_x_mark, batch_y_mark)
 
                     pred_y.append(outputs[:, -self.args.output_token_len:, :])
                 pred_y = torch.cat(pred_y, dim=1)
