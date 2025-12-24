@@ -3,7 +3,7 @@ is_training: 1
 root_path: ./dataset/ERA5-Large/
 data_path: pretrain.npy
 model_id: era5_pretrain
-n_vars: 4920
+n_vars: 1
 model: TSMA
 data: Era5_Pretrain
 input_token_len: 96
