@@ -45,7 +45,7 @@ class Model(nn.Module):
         self.gpt2.h = self.gpt2.h[:self.gpt_layers]
 
         self.in_layer = nn.Linear(configs.input_token_len, configs.d_model)
-        self.out_layer = nn.Linear(configs.d_model * self.patch_num, configs.pred_len)
+        self.out_layer = nn.Linear(configs.d_model * self.patch_num, configs.test_pred_len)
 
         for _, (name, param) in enumerate(self.gpt2.named_parameters()):
             if 'ln' in name or 'wpe' in name:
