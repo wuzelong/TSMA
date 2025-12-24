@@ -25,7 +25,7 @@ class Model(nn.Module):
         self.use_norm = configs.use_norm
         self.patch_size = configs.input_token_len
         self.stride = 8
-        self.patch_num = (configs.seq_len - self.input_token_len) // self.stride + 1
+        self.patch_num = (configs.seq_len - self.patch_size) // self.stride + 1
         self.gpt_layers = 6
         self.padding_patch_layer = nn.ReplicationPad1d((0, self.stride))
         self.patch_num += 1
