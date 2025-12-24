@@ -18,8 +18,8 @@ test_pred_len: 96
 train_epochs: 10
 use_norm: True
 batch_size: 40960
-d_model: 512
-e_layers: 4
+d_model: 1024
+e_layers: 8
 learning_rate: 0.0001
 cosine: True
 dim_R: 1024
