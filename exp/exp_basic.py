@@ -1,12 +1,10 @@
-from models import TSMA, gpt4ts
-
+from models import TSMA
 
 class Exp_Basic(object):
     def __init__(self, args):
         self.args = args
         self.model_dict = {
             "TSMA": TSMA,
-            "gpt4ts": gpt4ts,
         }
         self.model = self._build_model()
 

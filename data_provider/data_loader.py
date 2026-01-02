@@ -345,6 +345,10 @@ class UTSD_Npy(Dataset):
                     num_train = int(len(data) * self.split)
                     num_test = int(len(data) * (1 - self.split) / 2)
                     num_vali = len(data) - num_train - num_test
+
+                    date = np.arange(data.shape[0])
+                    date = date - date.min()
+
                     if num_train < self.context_len:
                         continue
                     border1s = [0, num_train - self.seq_len, len(data) - num_test - self.seq_len]
@@ -366,9 +370,6 @@ class UTSD_Npy(Dataset):
                     n_var = data.shape[1]
                     self.data_list.append(data)
 
-
-                    date = np.arange(data.shape[0])
-                    date = date - date.min()
                     date = date[border1:border2]
                     date = date.reshape(-1, 1)
                     date = np.tile(date, n_var)
@@ -492,6 +493,8 @@ class UnivariateDatasetBenchmark(Dataset):
 
         self.data_x = data[border1:border2]  # (8640, 7)
         self.data_y = data[border1:border2]  # (8640, 7)
+        self.data_x = self.data_x[:, -1:]
+        self.data_y = self.data_y[:, -1:]
 
 
         self.n_var = self.data_x.shape[-1]
