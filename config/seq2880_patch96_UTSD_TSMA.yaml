@@ -25,6 +25,5 @@ cosine: True
 dim_R: 1024
 dp: True
 devices: 0,1,2,3,4,5,6,7
-patience: 0
 adaptation: True
 pretrain_model_path: ./checkpoints/forecast_era5_pretrain_TSMA_Era5_Pretrain_sl3072_it96_ot96_lr0.0001_bt10240_wd0_el8_dm1024_dff2048_nh8_cosTrue_test_0_dR1024/checkpoint.pth
