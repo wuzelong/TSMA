@@ -130,7 +130,7 @@ class Exp_Forecast(Exp_Basic):
         model_optim = self._select_optimizer()
         scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(model_optim, T_max=self.args.tmax, eta_min=1e-8)
         criterion = self._select_criterion()
-
+        print(f"模型参数量: {sum(p.numel() for p in self.model.parameters()):,}")
         for epoch in range(self.args.train_epochs):
             iter_count = 0
             self.model.train()
