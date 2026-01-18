@@ -48,8 +48,12 @@ class Model(nn.Module):
             x /= stdev
         x = x.permute(0, 2, 1)
 
-        x1 = x[..., -S//2:]
-        batch_date1 = batch_date[..., -S//2:]
+        if x.shape[2] <= self.input_token_len:
+            x1 = x
+            batch_date1 = batch_date
+        else:
+            x1 = x[..., -S//2:]
+            batch_date1 = batch_date[..., -S//2:]
         x1 = x1.unfold(
             dimension=-1, size=self.input_token_len, step=self.input_token_len)
         N = x1.shape[2]
@@ -61,8 +65,12 @@ class Model(nn.Module):
         embed_out1 = embed_out1.reshape(B, C * N, -1)
         embed_out1, attns = self.blocks(embed_out1, batch_date1, n_vars=C, n_tokens=N)
 
-        xA = x[..., ::2].clone()
-        batch_dateA = batch_date[..., ::2].clone()
+        if x.shape[2] <= self.input_token_len:
+            xA = x
+            batch_dateA = batch_date
+        else:
+            xA = x[..., ::2].clone()
+            batch_dateA = batch_date[..., ::2].clone()
         xA = xA.unfold(
             dimension=-1, size=self.input_token_len, step=self.input_token_len)
         batch_dateA = batch_dateA.unfold(
@@ -73,8 +81,12 @@ class Model(nn.Module):
         embed_outA = embed_outA.reshape(B, C * N, -1)
         embed_outA, _ = self.blocks(embed_outA, batch_dateA, n_vars=C, n_tokens=N)
 
-        xB = x[..., 1::2].clone()
-        batch_dateB = batch_date[..., 1::2].clone()
+        if x.shape[2] <= self.input_token_len:
+            xB = x
+            batch_dateB = batch_date
+        else:
+            xB = x[..., 1::2].clone()
+            batch_dateB = batch_date[..., 1::2].clone()
         xB = xB.unfold(
             dimension=-1, size=self.input_token_len, step=self.input_token_len)
         batch_dateB = batch_dateB.unfold(

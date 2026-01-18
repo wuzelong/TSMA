@@ -1,0 +1,22 @@
+{
+  "activation": "relu",
+  "architectures": [
+    "HugTSMA"
+  ],
+  "d_ff": 2048,
+  "d_model": 512,
+  "dim_R": 1024,
+  "dropout": 0.1,
+  "e_layers": 4,
+  "flash_attention": false,
+  "input_token_len": 96,
+  "model_type": "TSMA",
+  "n_heads": 8,
+  "n_vars": 1,
+  "output_token_len": 96,
+  "test_pred_len": 96,
+  "test_seq_len": 96,
+  "torch_dtype": "float32",
+  "transformers_version": "4.41.0",
+  "use_norm": true
+}

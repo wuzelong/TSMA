@@ -164,7 +164,6 @@ class Exp_Forecast(Exp_Basic):
                 loss = criterion(outputs, batch_y)
                 loss.backward()
                 model_optim.step()
-                break
 
             if (self.args.ddp and self.args.local_rank == 0) or not self.args.ddp:
                 print("Epoch: {} cost time: {}".format(epoch + 1, time.time() - epoch_time))
@@ -266,53 +265,15 @@ class Exp_Forecast(Exp_Basic):
                 batch_y = batch_y.detach().cpu()
                 pred = outputs
                 true = batch_y
-                lookback = batch_x.detach().cpu()
 
                 preds.append(pred)
                 trues.append(true)
-                # if self.args.visualize and i % 2 == 0:
-                #     dir_path = folder_path + f'{self.args.test_pred_len}/'
-                #     if not os.path.exists(dir_path):
-                #         os.makedirs(dir_path)
-                #     gt = np.array(true[0, :, -1])
-                #     pd = np.array(pred[0, :, -1])
-                #     visual(gt, pd, os.path.join(dir_path, f'{i}.pdf'))
-                #
-                # if self.args.vis and i % 10 == 0:
-                #     dataset = self.args.data_path.split('.')[0]
-                #     save_path = f'./vis/{dataset}/{self.args.test_seq_len}_{self.args.input_token_len}_{self.args.test_pred_len}_{self.args.model}/'
-                #     if not os.path.exists(save_path):
-                #         os.makedirs(save_path)
-                #
-                #     gt = np.array(true[0, :, -1])
-                #     pd = np.array(pred[0, :, -1])
-                #     lb = np.array(lookback[0, :, -1])
-                #     with open(f'{save_path}/{i}.pkl', 'wb') as f:
-                #         d = {'gt': gt, 'pd': pd, 'lb': lb}
-                #         pickle.dump(d, f)
-
-            # for name, param in self.model.named_parameters():
-            #     for R_name in ['R_table1', 'R_table2']:
-            #         if R_name in name:
-            #             R_table = param.data.cpu()
-            #             save_table_path = './save_par'
-            #             if not os.path.exists(save_table_path):
-            #                 os.makedirs(save_table_path)
-            #             np.save(f"{save_table_path}/{self.args.model}_{self.args.model_id}_{R_name}.npy", R_table.numpy())
 
         preds = torch.cat(preds, dim=0).numpy()
         trues = torch.cat(trues, dim=0).numpy()
-        # print('preds shape:', preds.shape)
-        # print('trues shape:', trues.shape)
         if self.args.covariate:
             preds = preds[:, :, -1]
             trues = trues[:, :, -1]
         mae, mse, rmse, mape, mspe, smape = metric(preds, trues)
         print(f'mse:{mse:.5f}, mae:{mae:.5f}')
-        # f = open("result_long_term_forecast.txt", 'a')
-        # f.write(setting + "  \n")
-        # f.write('mse:{}, mae:{}'.format(mse, mae))
-        # f.write('\n')
-        # f.write('\n')
-        # f.close()
         return

@@ -29,13 +29,6 @@ Please download and extract the data into `./dataset`.
    run
 
 ```
-python run.py --config config/seq96_patch48_ETTh1_TSMA.yaml
+python run.py --config config/short-term/ETTh1.yaml
 ```
-
-## Acknowledgment
-
-We’re deeply grateful to the following GitHub repositories for their outstanding code and the effort their maintainers have invested.
-
-* OpenLTM[(https://github.com/thuml/OpenLTM)](https://github.com/thuml/OpenLTM)
-* TSLib[(https://github.com/thuml/Time-Series-Library)](https://github.com/thuml/Time-Series-Library)
 
